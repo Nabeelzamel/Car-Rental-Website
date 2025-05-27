@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // $(document).ready(function() {
+        // $('.dropdown-item').on('click', function() {
+        //     var selectedLocation = $(this).data('location');
+        //     hello(selectedLocation);
+        // });
+        // });
+        const urlParams = new URLSearchParams(window.location.search);
+        const customerId = urlParams.get('customerId');
+        console.log(customerId);
+        var carr;
+        function rentnow_button(car){
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('checkoutBlock').style.display = 'block';
+            carr=car;
+        }
+        function closeCheckout(){
+            event.preventDefault();
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('checkoutBlock').style.display = 'none';
+        }
+        function viewAllCars(){
+            fetch('car_data.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body:'location=' + encodeURIComponent("France") ,
+
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+            })
+            .catch(error => {
+                console.error('Error completing rent:', error);
+                if (error instanceof TypeError) {
+                    // Handle network or parsing errors
+                    alert('Error completing rent. Please check your network connection.');
+                } else {
+                    // Handle other types of errors
+                    alert('Error completing rent. Please try again.');
+                }
+            });
+        }
+        function completeRent(){
+            const pickupDate = document.getElementById('pickupDate').value;
+            const returnDate = document.getElementById('returnDate').value;
+            const paymentAmount = document.getElementById('paymentAmount').value;
+            fetch('car_data.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'carid=' + encodeURIComponent(carr.carId) +
+                    '&pickupDate=' + encodeURIComponent(pickupDate) +
+                    '&returnDate=' + encodeURIComponent(returnDate) +
+                    '&customerId=' + encodeURIComponent(customerId) +
+                    '&paymentMethod=' + encodeURIComponent(paymentAmount),
+
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+            })
+            .catch(error => {
+                console.error('Error completing rent:', error);
+                if (error instanceof TypeError) {
+                    // Handle network or parsing errors
+                    alert('Error completing rent. Please check your network connection.');
+                } else {
+                    // Handle other types of errors
+                    alert('Error completing rent. Please try again.');
+                }
+            });
+            alert('Rent completed! Thank you for renting.');
+            closeCheckout();
+        }
+        function home(){
+            window.location.href = "rental.html";
+        }
+        function getSelectedValue(groupID) {
+        var group = document.getElementById(groupID);
+        var selectedInput = group.querySelector("input:checked");
+        return selectedInput ? selectedInput.value : null;
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        document.getElementById("shapeGroup").addEventListener("change", sendToPHP);
+        document.getElementById("colorGroup").addEventListener("change", sendToPHP);
+        document.getElementById("priceGroup").addEventListener("change", sendToPHP);
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function () {
+                const selectedLocation = this.getAttribute('data-location');
+                sendToPHP(selectedLocation);
+            });
+        });
+        function sendToPHP(location) {
+        var shape = getSelectedValue("shapeGroup");
+        var color = getSelectedValue("colorGroup");
+        var price = getSelectedValue("priceGroup");
+    document.querySelector('.carContainer .row').innerHTML = '';
+    fetch('car_data.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'location=' + encodeURIComponent(location) +
+            '&shape=' + encodeURIComponent(shape) +
+            '&color=' + encodeURIComponent(color) +
+            '&price=' + encodeURIComponent(price),
+    })
+    .then(response => {
+        if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+    })
+            .then(data => {
+                for (let i = 0; i < data.length; i++) {
+                    const car = data[i];
+                    const cardHtml = `
+                        <div class="card car-card">
+                            <img src="${car.imagepath}" class="card-img-top" alt="${car.model}">
+                            <div class="card-body">
+                                <h3 class="card-text" style="color:#afaaaa;" >${car.model}</h3>
+                                <p class="card-text" style="color: #7e7b7b;" data-en="Year: ${car.year}" data-fr="Année: ${car.year}">Year: ${car.year}</p>
+                                <p class="card-text" style="color: #7e7b7b;" data-en="Price: ${car.price}" data-fr="Prix: ${car.price}">Price: ${car.price}</p>
+                                <a href="#" class="button" style="color: #f80505;" data-en="Rent Now" data-fr="Louer" onclick='rentnow_button(${JSON.stringify(car)})'>Rent Now</a>
+                            </div>
+                        </div>
+                    `;
+                    // Append the card HTML to the container
+                    document.querySelector('.carContainer .row').innerHTML += cardHtml;
+           
+                    // carContainer.insertAdjacentHTML('beforeend', cardHtml);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+}
+
+    });
+
+
+
+        // function hello(location){
+        //     jQuery.ajax({
+        //     type: 'POST',
+        //     url: 'car_data.php', // Replace with the actual path to your PHP script
+        //     data: { location: location },
+        //     success: function(response) {
+        //         // Handle the PHP script response if needed
+        //         console.log(response);
+        //     },
+        //     error: function(error) {
+        //         console.error(error);
+        //     }
+        // });
+        // }
+
+
+
+
+        //     if(location=='Egypt'){
+        //     window.location.href = "admin.html";
+        //     }
+        //     else if(location=='France'){
+        //         window.location.href = "login.html";
+        // }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Rental Page</title>
+    <link rel="stylesheet" href="D:/Xampp/htdocs/FinalProject/css/bootstrap.min.css">
+    <link rel="stylesheet" href="D:/Xampp/htdocs/FinalProject/css/all.min.css">
+    <link rel="stylesheet" href="D:/Xampp/htdocs/FinalProject/css/home.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 56px; /* Adjusted for fixed navbar */
+            font-family: "Roboto",sans-serif;
+            background: url(images/background.jpg) no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        /* .jumbotron {
+            background-image: url('car-rental-background.jpg');
+            background-size: cover;
+            color: white;
+            text-align: center;
+            padding: 100px 0;
+        } */
+        .col-md-2 {
+        position: relative;
+        z-index: 1;
+        }
+    .col-md-2::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #ff00002b; /* Red transparent block */
+        z-index: -1;
+        border-radius: 15px; /* Adjust the border-radius as needed */
+    }
+
+    /* Style for the text inside the column */
+    .col-md-2 h3,
+    .col-md-2 h4,
+    .col-md-2 label {
+        color: white; /* Set the text color to white or adjust as needed */
+    }
+        .car-card {
+            margin-bottom: 20px;
+            background-color:  #450101;
+            margin-left: 15px;
+        }
+        /* .jumbotron {
+            background-image: url('images/opel-astra-sedan-2016-2.jpg');
+            background-size: cover;
+            color: white;
+            background-size: contain;
+        } */
+
+        .card-img-top {
+            height: 200px;
+            width: 300px;
+        }
+
+        .container {
+            margin-left: 20px; /* Adjust margin for spacing */
+        }
+
+        .radio-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        button {
+            padding: 10px;
+            background-color: #f12020;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+
+        .navbar-expand-lg .navbar-nav .nav-link{
+        color: red;
+    }
+        .navbar-brand{
+            color: red;
+        }
+        .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+    }
+
+    /* Styles for the checkout block */
+    .checkoutBlock {
+        display: none;
+        z-index: -1;
+        background-color: #450101; /* White background */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for a subtle effect */
+    }
+    </style>
+</head>
+<body>
+<form action="car_data.php" method="post">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg  fixed-top">
+    <a class="navbar-brand" href="#" data-en="Car Rental" data-fr="Location de voiture">Car Rental</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#" onclick="home()" data-en="Home" data-fr="accueil">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    location
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown" >
+                    <a class="dropdown-item" href="#" data-location="Egypt">Egypt</a>
+                    <a class="dropdown-item" href="#" data-location="France">France</a>
+                    <a class="dropdown-item" href="#" data-location="germany">Germany</a>
+                    <a class="dropdown-item" href="#" data-location="Emirates">Emirates</a>
+                </div>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#" onclick="toggleLanguage()" data-en="language" data-fr="langue">language <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-en="Contact us" data-fr="Contactez nous">Contact Us</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Jumbotron -->
+<!-- <div class="jumbotron" style=" background-size: contain; background-image: url('images/opel-astra-sedan-2016-2.jpg');  background-position: center center; background-size: cover; color: white;">
+    <h1 class="display-4">Rent a Car</h1>
+    <p class="lead">Explore our fleet of cars and find the perfect ride for your journey.</p>
+    <a class="button" type="submit" href="#" onclick="viewAllCars()" role="button">View Cars</a>
+</div> -->
+<!-- specs -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <h3 style="color:#afaaaa;" data-en="Vehicle types" data-fr="types de véhicules">Vehicle types</h3>
+            <h4 data-en="Shape" data-fr="forme">Shape</h4>
+            <div class="radio-group" id="shapeGroup">
+                <label>
+                    <input type="radio" name="shape" value="suv"> SUV
+                </label>
+                <label>
+                    <input type="radio" name="shape" value="mini"> Mini
+                </label>
+                <label>
+                    <input type="radio" name="shape" value="4x4"> 4x4
+                </label>
+                <label>
+                    <input type="radio" name="shape" value="sedan"> sedan
+                </label>
+                <label>
+                    <input type="radio" name="shape" value="" data-en="ALL" data-fr="Tous"> All
+                </label>
+            </div>
+            <h4 data-en="Color" data-fr="Couleur">Color</h4>
+            <div class="radio-group" id="colorGroup">
+                <label>
+                    <input type="radio" name="color" value="black" data-en="black" data-fr="noire"> black
+                </label>
+                <label>
+                    <input type="radio" name="color" value="red" data-en="red" data-fr="rouge">red
+                </label>
+                <label>
+                    <input type="radio" name="color" value="blue" data-en="blue" data-fr="bleu">blue
+                </label>
+                <label>
+                    <input type="radio" name="color" value="" data-en="All" data-fr="tous"> All
+                </label>
+            </div>
+            <h4 data-en="Price Range" data-fr="Prix">Price Range</h4>
+            <div class="radio-group" id="priceGroup">
+                <label>
+                    <input type="radio" name="price" value="100"> 100 EG
+                </label>
+                <label>
+                    <input type="radio" name="price" value="120"> 120 EG
+                </label>
+                <label>
+                    <input type="radio" name="price" value="150">150 EG
+                </label>
+                <label>
+                    <input type="radio" name="price" value="200">200 EG
+                </label>
+                <label>
+                    <input type="radio" name="price" value="" data-en="ALL" data-fr="tous"> All
+                </label>
+            </div>
+        </div>
+        <!-- Car Cards -->
+        <div class="col-md-8 carContainer">
+                <div class="row" id="car-container">
+                    
+                </div>
+                <div id="overlay" class="overlay">
+                    <div id="checkoutBlock"class="checkoutBlock">
+                        <h2 style="color:white;" data-en="Checkout" data-fr="vérifier">Checkout</h2>
+                        <label for="pickupDate" style="color:white;"  data-en="Pick-up Date:" data-fr="Date de collecter:">Pick-up Date:</label>
+                        <input type="date" id="pickupDate" required>
+                        <label for="returnDate" style="color:white;" data-en="Return Date:" data-fr="Date de retour:">Return Date:</label>
+                        <input type="date" id="returnDate" required>
+                        <label for="paymentAmount" style="color:white;" data-en="Payment Amount:" data-fr="Montant du paiement:">Payment Amount:</label>
+                        <input type="text" id="paymentAmount" required>
+                        <label for="paymentMethod" style="color:white;" data-en="Payment Method:" data-fr="mode de paiement:">Payment Method:</label>
+                        <select id="paymentMethod" required>
+                            <option value="creditCard">Credit Card</option>
+                            <option value="paypal">PayPal</option>
+                        </select>
+                        <button onclick="completeRent()" data-en="Complete Rent" data-fr="complete le louer">Complete Rent</button>
+                        <button onclick="closeCheckout()" data-en="Close" data-fr="fermer">Close</button>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+<script>
+    let currentLanguage = 'en';
+
+function toggleLanguage() {
+    const elements = document.querySelectorAll('[data-en], [data-fr]');
+
+    elements.forEach(element => {
+        if (currentLanguage === 'en') {
+            element.textContent = element.getAttribute('data-fr');
+        } else {
+            element.textContent = element.getAttribute('data-en');
+        }
+    });
+
+    // Toggle the current language
+    currentLanguage = (currentLanguage === 'en') ? 'fr' : 'en';
+}
+    document.addEventListener("DOMContentLoaded", function() {
+        // Show overlay on page load
+        document.getElementById("over").style.display = "flex";
+    });
+</script>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</form>
+</body>
+</html>
