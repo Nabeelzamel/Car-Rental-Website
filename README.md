@@ -58,24 +58,12 @@ Update connect.php with your local DB credentials if necessary.
 ▶️ How to Run
 Open your browser and go to:
 
-arduino
-Copy
-Edit
 http://localhost/rental-car--main/home.html
 Register or log in as a user to begin renting cars.
 
 Use admin.html for admin access and managing the fleet.
 
-📸 Screenshots
-![![alt text](![alt text](image-1.png))](image.png)
-![![alt text](image-3.png)](image-2.png)
-![![alt text](image-5.png)](image-4.png)
-📌 Notes
-Ensure PHP and MySQL are installed and properly configured.
 
-No external libraries or frameworks are required.
-
-Basic validation is implemented.
 
 👨‍💻 Author
 Nabeel Mohamed
